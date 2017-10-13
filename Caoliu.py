@@ -15,8 +15,10 @@ class Caoliu:
             'Connection': 'keep-alive',
             'Host': 'www.t66y.com',
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/59.0.3071.115 Safari/537.36',
         }
+        # if not exist torrent_dir, then create it
         if "torrent_dir" not in os.listdir(os.getcwd()):
             os.makedirs("torrent_dir")
 
@@ -30,7 +32,8 @@ class Caoliu:
             'Host': 'rmdown.com',
             'Referer': 'http://www.viidii.info/?http://rmdown______com/link______php?' + url.split("?")[1],
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/59.0.3071.115 Safari/537.36'
         }
         try:
             download_text = requests.get(url, headers=header_data2).text
@@ -39,8 +42,9 @@ class Caoliu:
             ref = p_ref.findall(download_text)[0]
             reff = p_reff.findall(download_text)[0]
             r = requests.get("http://www.rmdown.com/download.php?ref=" + ref + "&reff=" + reff + "&submit=download")
+            # just get green torrent link
             with open("torrent_dir\\" + ref + str(random.randint(1, 100)) + ".torrent", "wb") as f:
-                f.write(r.content)
+                f.write(r.content) # add random number to name , avoid conflicting
         except:
             print("download page " + url + " failed")
 
@@ -91,13 +95,16 @@ class Caoliu:
         thread_list = []
         for i in range(page_start, page_end + 1):
             thread_list.append(threading.Thread(target=self.index_page, args=(fid, i,)))
-        for t in thread_list:
-            t.start()
+            # create thread to search page and download torrent
+            # multi-thread in index page not download torrent, it's deliberate to avoid DDOS
+        for t in range(len(thread_list)):
+            thread_list[t].start()
+            print("No." + str(t) + " thread start")
             while True:
-                if (len(threading.enumerate()) < max_thread_num):
+                if len(threading.enumerate()) < max_thread_num:
                     break
 
 
 if __name__ == "__main__":
     c = Caoliu()
-    c.start(type="yazhouwuma", page_start=1, page_end=50, max_thread_num=50)
+    c.start(type="yazhouwuma", page_start=1, page_end=5, max_thread_num=50)
