@@ -44,7 +44,7 @@ class Caoliu:
             r = requests.get("http://www.rmdown.com/download.php?ref=" + ref + "&reff=" + reff + "&submit=download")
             # just get green torrent link
             with open("torrent_dir\\" + ref + str(random.randint(1, 100)) + ".torrent", "wb") as f:
-                f.write(r.content) # add random number to name , avoid conflicting
+                f.write(r.content)  # add random number to name , avoid conflicting
         except:
             print("download page " + url + " failed")
 
@@ -76,19 +76,17 @@ class Caoliu:
         except:
             print("detail page " + url + " get failed")
 
-    def start(self, type, page_start=1, page_end=10, max_thread_num=10):
-        if type == "yazhouwuma":
-            fid = 2
-        elif type == "yazhouyouma":
-            fid = 15
-        elif type == "oumeiyuanchuang":
-            fid = 4
-        elif type == "dongmanyuanchuang":
-            fid = 5
-        elif type == "guochanyuanchuang":
-            fid = 25
-        elif type == "zhongziyuanchuang":
-            fid = 26
+    def start(self, downloadtype, page_start=1, page_end=10, max_thread_num=10):
+        type_dict = {
+            "yazhouwuma":2,
+            "yazhouyouma":15,
+            "oumeiyuanchuang":4,
+            "dongmanyuanchuang":5,
+            "guochanyuanchuang":25,
+            "zhongziyuanchuang":26,
+        }
+        if downloadtype in type_dict.keys():
+            fid = type_dict[downloadtype]
         else:
             raise ValueError("type wrong!")
         max_thread_num = min(page_end - page_start + 1, max_thread_num)
@@ -107,4 +105,4 @@ class Caoliu:
 
 if __name__ == "__main__":
     c = Caoliu()
-    c.start(type="yazhouwuma", page_start=1, page_end=5, max_thread_num=50)
+    c.start(downloadtype="yazhouwuma", page_start=1, page_end=5, max_thread_num=50)
