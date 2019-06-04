@@ -3,7 +3,9 @@ import re
 import os
 import threading
 import random
-
+import socks,socket
+socks.set_default_proxy(socks.PROXY_TYPE_SOCKS5,"127.0.0.1",1080)
+socket.socket=socks.socksocket
 
 class Caoliu:
     def __init__(self):
